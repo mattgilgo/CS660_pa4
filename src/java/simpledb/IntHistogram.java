@@ -7,7 +7,7 @@ public class IntHistogram {
     private int min;
     private int max;
     private int valueCount;
-    private int bucketcount;
+    private int bucketCount;
     private int modulo;
 
 
@@ -30,7 +30,7 @@ public class IntHistogram {
     public IntHistogram(int buckets, int min, int max) {
     	// some code goes here
         
-        this.bucketcount = buckets;
+        this.bucketCount = buckets;
         this.buckets = new int[buckets];
         this.min = min;
         this.max = max;
@@ -51,6 +51,89 @@ public class IntHistogram {
         this.valueCount++;
     }
 
+    private double estimateSelectivityWhenEquals(int v) {
+        int properBucket = (v - this.min)/this.modulo;
+        if (properBucket < 0) {
+            properBucket = -1;
+        } else if (properBucket >= this.bucketCount) {
+            properBucket = this.bucketCount;
+        }
+
+        if (properBucket < 0) {
+            return 0.0;
+        } else if (properBucket >= this.bucketCount) {
+            return 0.0;
+        }
+        int h = this.buckets[properBucket];
+        double dub = (double)((double)h/this.modulo)/this.valueCount;
+        return dub;
+    }
+
+    private double estimateSelectivityWhenNotEquals(int v, Predicate.Op op) {
+        int properBucket = (v - this.min)/this.modulo;
+        if (properBucket < 0) {
+            properBucket = -1;
+        } else if (properBucket >= this.bucketCount) {
+            properBucket = this.bucketCount;
+        }
+
+        int leftBucket = 0;
+        int rightBucket = 0;
+        int hereBucket = 0;
+        int h = 0;
+        double sel = 0.0;
+
+        if (properBucket >= this.bucketCount) {
+            leftBucket = this.bucketCount-1;
+            rightBucket = this.bucketCount;
+            hereBucket = 0;
+            h = 0;
+        } else if (properBucket < 0) {
+            leftBucket = -1;
+            rightBucket = 0;
+            hereBucket = 0;
+            h = 0;
+        } else {
+            leftBucket = properBucket-1;
+            rightBucket = properBucket+1;
+            hereBucket = -1;
+            h = this.buckets[properBucket];
+        }
+
+        switch(op) {
+            case LESS_THAN:
+                if (hereBucket == -1) {
+                    hereBucket = (v - (this.modulo*leftBucket) + this.min)/this.modulo;
+                }
+                sel = h * hereBucket / this.valueCount;
+                if (leftBucket < 0) {
+                    double dub = sel / this.valueCount;
+                    return dub;
+                }
+                for (int i = leftBucket; i >= 0; i--) {
+                    sel += this.buckets[i];
+                }
+                double dub2 = sel / this.valueCount;
+                return dub2;
+            case GREATER_THAN:
+                if (hereBucket == -1) {
+                    hereBucket = ((this.modulo*rightBucket) + this.min - v)/this.modulo;
+                }
+                sel = h * hereBucket / this.valueCount;
+                if (rightBucket > this.bucketCount) {
+                    double dub = sel / this.valueCount;
+                    return dub;
+                }
+                for (int j = rightBucket; j < this.bucketCount; j++) {
+                    sel += this.buckets[j];
+                }
+                double dub3 = sel / this.valueCount;
+                return dub3;
+        default:
+            return -1.0;
+        }
+    }
+
     /**
      * Estimate the selectivity of a particular predicate and operand on this table.
      * 
@@ -65,13 +148,24 @@ public class IntHistogram {
 
     	// some code goes here
 
-        //switch(op) {
-        //    case GREATER_THAN:
-        //    case EQUALS:
-        //    case LIKE:
-        //        return estimateSelectivityEquals(v);
-        //}
-        return -1.0;
+        switch(op) {
+            case EQUALS:
+                return estimateSelectivityWhenEquals(v);
+            case NOT_EQUALS:
+                return 1.0 - estimateSelectivityWhenEquals(v);
+            case LIKE:
+                return estimateSelectivityWhenEquals(v);
+            case GREATER_THAN:
+                return estimateSelectivityWhenNotEquals(v, op);
+            case LESS_THAN:
+                return estimateSelectivityWhenNotEquals(v, op);
+            case GREATER_THAN_OR_EQ:
+                return (estimateSelectivityWhenNotEquals(v, Predicate.Op.GREATER_THAN) + estimateSelectivityWhenEquals(v));
+            case LESS_THAN_OR_EQ:
+                return (estimateSelectivityWhenNotEquals(v, Predicate.Op.LESS_THAN) + estimateSelectivityWhenEquals(v));
+            default:
+                return -1.0;
+        }
     }
     
     /**
@@ -93,6 +187,20 @@ public class IntHistogram {
      */
     public String toString() {
         // some code goes here
-        return null;
+
+        String returnStr = "";
+
+        for (int i = 0; i < this.bucketCount; i++) {
+            returnStr += "Bucket Number" + i + ":";
+
+            for (int j = 0; j < this.buckets[i]; j++) {
+                returnStr += " , ";
+            }
+
+            returnStr += "\n";
+        }
+
+        return returnStr;
+        
     }
 }
