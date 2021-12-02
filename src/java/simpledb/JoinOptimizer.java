@@ -237,8 +237,35 @@ public class JoinOptimizer {
         //Not necessary for labs 1--3
 
         // some code goes here
-        //Replace the following
-        return joins;
+        
+        Set<LogicalJoinNode> hashSet = new HashSet<LogicalJoinNode>(joins);
+        Set<Set<LogicalJoinNode>> join = enumerateSubsets(joins, 1);
+        PlanCache cache = new PlanCache();
+        for (int i = 0; i < join.size(); i++) {
+            for (Set<LogicalJoinNode> s : enumerateSubsets(joins, i)) {
+                CostCard newCC = new CostCard();
+                newCC.cost = Double.MAX_VALUE;
+                newCC.card = Integer.MAX_VALUE;
+                newCC.plan = null;
+                for (LogicalJoinNode node : s) {
+                    CostCard planCC = computeCostAndCardOfSubplan(stats, filterSelectivities, node, s, newCC.cost, cache);
+                    if (newCC.cost > planCC.cost) {
+                        if (planCC != null) {
+                            newCC = planCC;
+                        }
+                    }
+                }
+                cache.addPlan(s, newCC.cost, newCC.card, newCC.plan);
+            }
+        }
+
+        Vector<LogicalJoinNode> newV = cache.getOrder(hashSet);
+
+        if (explain == true) {
+            printJoins(newV, cache, stats, filterSelectivities);
+        }
+
+        return newV;
     }
 
     // ===================== Private Methods =================================
