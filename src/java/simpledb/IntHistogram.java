@@ -3,6 +3,13 @@ package simpledb;
 /** A class to represent a fixed-width histogram over a single integer-based field.
  */
 public class IntHistogram {
+    private int[] buckets;
+    private int min;
+    private int max;
+    private int valueCount;
+    private int bucketcount;
+    private int modulo;
+
 
     /**
      * Create a new IntHistogram.
@@ -22,6 +29,13 @@ public class IntHistogram {
      */
     public IntHistogram(int buckets, int min, int max) {
     	// some code goes here
+        
+        this.bucketcount = buckets;
+        this.buckets = new int[buckets];
+        this.min = min;
+        this.max = max;
+        this.valueCount = 0;
+        this.modulo = (int)Math.ceil((double)(max-min+1)/buckets);
     }
 
     /**
@@ -30,6 +44,11 @@ public class IntHistogram {
      */
     public void addValue(int v) {
     	// some code goes here
+
+        int properBucket = (v-this.min)/this.modulo;
+        //int arrLen = this.buckets.length;
+        this.buckets[properBucket]++;   // may be out of index
+        this.valueCount++;
     }
 
     /**
@@ -45,6 +64,13 @@ public class IntHistogram {
     public double estimateSelectivity(Predicate.Op op, int v) {
 
     	// some code goes here
+
+        //switch(op) {
+        //    case GREATER_THAN:
+        //    case EQUALS:
+        //    case LIKE:
+        //        return estimateSelectivityEquals(v);
+        //}
         return -1.0;
     }
     
