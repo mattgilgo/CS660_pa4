@@ -1,14 +1,10 @@
-# Compiled class file
+# Default ignored files
+/shelf/
+# xml's
+*.xml
+
+# Compiled files
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
 
 # Package Files #
 *.jar
@@ -21,3 +17,15 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Editor files
+.idea/
+
+#Library files
+lib/
+
+#test files
+test/
+
+# Java file idk if we should ignore
+*.iml
