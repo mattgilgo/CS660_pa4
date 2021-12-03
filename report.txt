@@ -1,0 +1,29 @@
+CS660 Project Assignment 2 Report
+
+######################################################################################################
+
+Name1: Shilpen Patel
+UID1: U52493692
+
+Name2: Matthew Gilgo
+UID2: U43413276
+
+######################################################################################################
+=====================================================================================
+1. Describe any design decisions you made. [Please refer to the lab website for detailed requirements here.]
+In our design when tried to leverage the existing methods for the methods we needed to implement for this programming assignment. The main purpose of this assignment was to further develop the simpleDb from assignment 1, 2 and 3 by completing the implementation of a set of operators to allow for query optimizations in the SimpleDb. Generally, we used the provided class structures as directed to implement the necessary methods.
+=====================================================================================
+2. Discuss and justify any changes you made to the API.
+No changes were made to the API as all the methods for the operators and aggregators were implemented with the given structure.
+=====================================================================================
+3. Describe any missing or incomplete elements of your code.
+All the methods needed for this programming assignment were implemented.
+=====================================================================================
+4. Describe how long you spent on the assignment, and whether there was anything you found particularly difficult or confusing.
+The assignment over all took about 10 hours between the two of us to complete. Fortunately, the time needed to understand the code structure was significantly less than the first three assignments as this programming assignment built off the other assignments. One of the most tricky parts of this assignment was completing the orderJoin method in the join optimizer as an improper implementation would result in null pointer exceptions. Furthermore, writing the algorithms to estimate join cost and join cardinality were challenging to implement as well.
+=====================================================================================
+5. If you collaborate with someone else, you have to describe how you split the workload.
+We collaborated effectively on this assignment by using a shared Github repository. We began by discussing the programming assignment instructions in detail until we were both satisfied with our understanding of the goal of the assignment, the methods available, and the methods we needed to implement for this assignment. The workload was divided by the methods we implemented. Matt took lead on implementing the IntHistogram, estimateJoinCost, estimateJoinCardinality. Shilpen took the lead on implementing the methods in TableStats and the remaining join methods in JoinOptimizer. Overall, it was great working together as a team on this assignment.
+=====================================================================================
+######################################################################################################
+
